@@ -8,4 +8,6 @@
     <string name="episodes">Episodes</string>
     <string name="watch_list">Watch List</string>
     <string name="searchtvname">Search Tv Name</string>
+    <string name="no_connection_found">No Connection Found</string>
+    <string name="try_agin">Retry</string>
 </resources>

@@ -15,6 +15,7 @@ public class SearchViewModel extends ViewModel {
     }
 
     public LiveData<TvShowResponse> getSearchedResult(String search, int page) {
-       return searchTvShowRepo.liveData(search, page);
+        String searchResult = "%" + search + "%";
+       return searchTvShowRepo.liveData(searchResult, page);
     }
 }

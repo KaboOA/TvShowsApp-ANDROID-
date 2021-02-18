@@ -1,7 +1,10 @@
 package eg.kabooo.tvshows.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,21 +49,30 @@ public class MainActivity extends AppCompatActivity implements TvShowListener {
         b.homeRecyclerView.setAdapter(adapter);
         b.imageSearch.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, SearchActivity.class)));
         b.imageWatchList.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, WatchListActivity.class)));
+        b.tryAginBtn.setOnClickListener(v -> getData());
 
-        onScroll();
         getData();
+        onScroll();
+
     }
 
 
     private void getData() {
-        toggleLoading();
-        viewModel.getMostPopularTvShows(currentPage).observe(this, o -> {
+        if (isNetwork()) {
+            b.networkLinearLayout.setVisibility(View.GONE);
+            b.homeRecyclerView.setVisibility(View.VISIBLE);
             toggleLoading();
-            totalPages = o.getPages();
-            int oldCount = tvShowList.size();
-            tvShowList.addAll(o.getTvShows());
-            adapter.notifyItemRangeInserted(oldCount, tvShowList.size());
-        });
+            viewModel.getMostPopularTvShows(currentPage).observe(this, o -> {
+                toggleLoading();
+                totalPages = o.getPages();
+                int oldCount = tvShowList.size();
+                tvShowList.addAll(o.getTvShows());
+                adapter.notifyItemRangeInserted(oldCount, tvShowList.size());
+            });
+        } else {
+            b.setIsLoading(false);
+            b.homeRecyclerView.setVisibility(View.GONE);
+        }
     }
 
     private void toggleLoading() {
@@ -79,19 +91,28 @@ public class MainActivity extends AppCompatActivity implements TvShowListener {
     }
 
     private void onScroll() {
+
         b.homeRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (!b.homeRecyclerView.canScrollVertically(1)) {
-                    if (currentPage <= totalPages) {
-                        currentPage += 1;
-                        getData();
+                if (isNetwork()) {
+                    if (!b.homeRecyclerView.canScrollVertically(1)) {
+                        if (currentPage <= totalPages) {
+                            currentPage += 1;
+                            getData();
+                        }
                     }
                 }
             }
         });
 
+    }
+
+
+    private boolean isNetwork() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
 }
