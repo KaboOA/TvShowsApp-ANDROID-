@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements TvShowListener {
 
     }
 
-
     private void getData() {
         if (isNetwork()) {
             b.networkLinearLayout.setVisibility(View.GONE);
@@ -108,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements TvShowListener {
         });
 
     }
-
 
     private boolean isNetwork() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
